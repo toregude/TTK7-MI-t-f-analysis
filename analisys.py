@@ -1,6 +1,7 @@
 # Importing libraries
 import numpy as np
 from scipy.io import loadmat
+import matplotlib.pyplot as plt
 
 bigData = loadmat('allParticipantsEEGData13.mat')
 
@@ -131,8 +132,8 @@ def get_subject_dict_avg(data, subject, seconds_of_pre_trial_data=3):
             right_hand_seqences.extend(right_hand_seqences_new_fixed)
             feet_seqences.extend(feet_seqences_new_fixed)
         # Avarage the data in frequency domain
-        rh_freq_avg, rh_time_avg, freq_axis = get_avg_in_freq(right_hand_seqences, fs, max_length)
-        feet_freq_avg, feet_time_avg, _ = get_avg_in_freq(feet_seqences, fs, max_length)
+        rh_freq_avg, rh_time_avg, freq_axis = get_avg_in_freq(right_hand_seqences, fs, max_length+fs*seconds_of_pre_trial_data)
+        feet_freq_avg, feet_time_avg, _ = get_avg_in_freq(feet_seqences, fs, max_length+fs*seconds_of_pre_trial_data)
 
         subject_dict[electrode] = {
             'right_hand_avg_time': np.mean(right_hand_seqences, axis=0), 
@@ -146,5 +147,45 @@ def get_subject_dict_avg(data, subject, seconds_of_pre_trial_data=3):
         
     return subject_dict
 
+
+
+def plot_subject_avg(subject_dict):
+    num_electrodes = len(subject_dict)
+
+    # Iterate over each electrode
+    for electrode in range(num_electrodes):  # Assuming electrodes are numbered from 1 to 15
+        data = subject_dict[electrode]
+
+        # Create a figure with subplots
+        fig, axs = plt.subplots(3, 2, figsize=(15, 9))
+        fig.suptitle(f'Electrode {electrode}')
+
+        # Plotting time domain averages
+        axs[0, 0].plot(data['right_hand_avg_time'])
+        axs[0, 0].set_title('Right Hand - Avg Time Domain')
+        axs[0, 1].plot(data['feet_avg_time'])
+        axs[0, 1].set_title('Feet - Avg Time Domain')
+
+        # Plotting frequency domain averages
+        axs[1, 0].plot(data['freq_axis'], np.abs(data['right_hand_avg_freq']))  # Plot magnitude of FFT
+        axs[1, 0].set_xlim(0, 45)  # Limit x-axis from 0 to 45 Hz
+        axs[1, 0].set_title('Right Hand - Avg Frequency Domain')
+        axs[1, 0].set_xlabel('Frequency (Hz)')
+        axs[1, 1].plot(data['freq_axis'], np.abs(data['feet_avg_freq']))  # Plot magnitude of FFT
+        axs[1, 1].set_xlim(0, 45)  # Limit x-axis from 0 to 45 Hz
+        axs[1, 1].set_title('Feet - Avg Frequency Domain')
+        axs[1, 1].set_xlabel('Frequency (Hz)')
+
+        # Plotting inverse FFT signals
+        axs[2, 0].plot(data['right_hand_time_from_freq'])
+        axs[2, 0].set_title('Right Hand - Time From Freq')
+        axs[2, 1].plot(data['feet_time_from_freq'])
+        axs[2, 1].set_title('Feet - Time From Freq')
+
+        # Adjust layout and show plot
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+        plt.show()
+
 subject = get_subject_dict_avg(data,0)
 print_formatted_struct(subject)
+plot_subject_avg(subject)
