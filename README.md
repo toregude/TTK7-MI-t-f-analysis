@@ -2,9 +2,8 @@
 
 To get the data go to [http://bnci-horizon-2020.eu/database/data-sets]() and download all the files on the 2. entry. This means all the SxT files and all the SxE files from x = 01 to 13.
 
-Then put them in a folder structure like the following in a matlab repo:
+Then put them in the folder named data like so:
 
-fix_data.m
 data/
 -S01T
 -S01E
@@ -12,10 +11,14 @@ data/
 -S13T
 -S13E
 
-Also remember to move the fix_data.m file into the repo on the same level as the data folder.
+Then run the mne_analisys.ipynb
 
-Then run the fix_data file and you will be left with a workable .mat file that can then be moved into this repo.
+Remember to create a Virtual enviornment with all the neccecary libraries like this:
 
-The file will be to big to be hosted on git.
+```bash
+python -m venv ttk7
+source ttk7/bin/activate  # On Windows: ttk7\Scripts\activate
+pip install -r requirements.txt
+```
 
-When the file is in this repo change the name in the analisys.ipynb to the name of the file you made and run the ipynb file
+Also when you select the mne_analisys.ipynb remember to select the ttk7 venv as the python env in the upper right corner.
