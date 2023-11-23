@@ -1,6 +1,6 @@
 ### Get the data
 
-To get the data go to [http://bnci-horizon-2020.eu/database/data-sets]() and download all the files on the 2. entry. This means all the SxT files and all the SxE files from x = 01 to 13.
+To get the data go to [http://bnci-horizon-2020.eu/database/data-sets]() (might need to find it on the web archive https://web.archive.org/web/20231119215248/http://bnci-horizon-2020.eu/database/data-sets) and download all the files on the 2. entry. This means all the SxT files and all the SxE files from x = 01 to 13.
 
 Then put them in the folder named data like so:
 
