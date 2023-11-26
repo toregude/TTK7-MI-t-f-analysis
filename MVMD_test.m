@@ -1,19 +1,22 @@
-% 
-% T = 1000; t = (1:T)/T;
-% f_channel1 = (cos(2*pi*2*t)) + (1/16*(cos(2*pi*36*t))); % Channel 1 contains 2 Hz and 36Hz tones
-% f_channel2 = (1/4*(cos(2*pi*24*t))) + (1/16*(cos(2*pi*36*t))); % Channel 2 contains 24 Hz and 36Hz tones
-% f = [f_channel1;f_channel2]; % Making a bivariate signal
-% [u, u_hat, omega] = MVMD(f, 2000, 0, 3, 0, 1, 1e-7); 
-% Example 2: Real World Data (EEG Data)
-% load('alpa_band_EEG01.mat');
-[u, u_hat, omega] = MVMD(alpha_band, 2000, 0, 6, 0, 1, 1e-7);
+load('erp_data.mat');
 %%
-plot(omega)
+[u_hands, u_hat_hands, omega_hands] = MVMD(erp_hands', 2000, 0, 6, 0, 1, 1e-7);
+[u_feet, u_hat_feet, omega_feet] = MVMD(erps_feet', 2000, 0, 6, 0, 1, 1e-7);
+% %%
+% % Create a dictionary with 6 arrays
+% output_data = containers.Map;
+% output_data('u_hands') = u_hands;
+% output_data('u_hat_hands') = u_hat_hands;
+% output_data('omega_hands') = omega_hands;
+% output_data('u_feet') = u_feet;
+% output_data('u_hat_feet') = u_hat_feet;
+% output_data('omega_feet') = omega_feet;
+% 
+% % Save the dictionary to a MAT file
+% save('output_data.mat', 'output_data');
+% 
+% 
+% % Save the arrays individually to a MAT file
 
 %%
-u = u';
-for i = 1:size(u,2)
-    subplot(size(u,2), 1, i);
-    plot(u(:, i));
-    title(['Plot ', num2str(i)]);
-end
+save('output_data.mat', 'u_hands', 'u_hat_hands', 'omega_hands', 'u_feet', 'u_hat_feet', 'omega_feet');
