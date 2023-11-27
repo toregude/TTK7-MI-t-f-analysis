@@ -3,8 +3,21 @@ hand = load('mat/erp_hands.mat');
 
 feet_data = feet.evoked_data;
 hand_data = hand.evoked_data;
+
+% Fs = 512;          % Sampling frequency
+% cutoff_frequency = 40;  % Cutoff frequency in Hz
+% 
+% % Design a Butterworth low-pass filter
+% order = 4;  % Filter order
+% [b, a] = butter(order, cutoff_frequency/(Fs/2), 'low');
+% 
+% 
+% for i = 1:size(hand_data, 1)
+%     feet_data(i, :) = filter(b, a, feet_data(i, :));
+%     hand_data(i, :) = filter(b, a, hand_data(i, :));
+% end
 %%
-K = 5;
+K = 4;
 [u_f, u_hat_f, omega_f] = MVMD(feet_data', 2000, 0, K, 0, 1, 1e-7);
 [u_h u_hat_h, omega_h] = MVMD(hand_data', 2000, 0, K, 0, 1, 1e-7);
 
@@ -29,63 +42,139 @@ K = 5;
 %save('output_data.mat', 'u_hands', 'u_hat_hands', 'omega_hands', 'u_feet', 'u_hat_feet', 'omega_feet');
 
 %%
-
-ch1 = 13;
-ch2= 13;
+t = linspace(-1,round((length(hand_data(1,:))-512)/512),length(hand_data(1,:)));
+ch1 = 2;
+ch2= 2;
 figure;
-subplot(K+1,1,1);
+subplot(K+1-2,1,1);
 hold on;
-plot(feet_data(ch1,:));
-plot(hand_data(ch2,:));
-
+plot(t,feet_data(ch1,:));
+plot(t,hand_data(ch2,:));
+legend('Feet', 'Hand')
+title("ERP");
+xlabel('Seconds');
+ylabel('μV');
+grid on;
 % subplot(K+1-4,2,2);
 % plot(evoked_data(ch2,:));
-
-for i = 1:K
-    subplot(K+1, 1, i+1);
+titles = ["IMF 4", "IMF 3"];
+for i = 1:K-2
+    subplot(K+1-2, 1, i+1);
     hold on;
-    plot(u_f(i,:,ch1));
-    plot(u_h(i,:,ch2));
+    plot(t,u_f(i,:,ch1));
+    plot(t,u_h(i,:,ch2));
+    legend('Feet', 'Hand');
+    title(titles(i));
+    grid on;
+    xlabel('Seconds');
+    ylabel('μV');
 
     % subplot(K+1-4, 2, 2*i+2);
     % plot(u(i,:,ch2));
 end
-
-%%
+% saveas(gcf, 'IMF.png');
 % Generate a sample signal
 Fs = 512;          % Sampling frequency
 
 [pxx1, f1] = pwelch(feet_data(ch1,:), [], [], [], Fs);
 [pxx2, f2] = pwelch(hand_data(ch2,:), [], [], [], Fs);
 figure;
-ylim = [-40,0];
 
-subplot(K+1,1,1);
+
+subplot(K+1-2,1,1);
 hold on;
-plot(f1(1:100), (pxx1(1:100)));
-plot(f2(1:100), (pxx2(1:100)));
+plot(f1(1:60), (pxx1(1:60)));
+plot(f2(1:60), (pxx2(1:60)));
 grid on;
 ylim = [-40,0];
+legend('Feet', 'Hand');
+title("PDS of ERP");
+xlabel('Hz');
+ylabel('(μV)^2/Hz');
 % subplot(K+1-4,2,2);
 % plot(evoked_data(ch2,:));
-
-for i = 1:K
+titles = ["PDS of IMF 4", "PDS of IMF 3"];
+for i = 1:K-2
     % Compute power spectral density using pwelch
     [pxx1, f1] = pwelch(u_f(i,:,ch1), [], [], [], Fs);
     [pxx2, f2] = pwelch(u_h(i,:,ch2), [], [], [], Fs);
 
-    subplot(K+1, 1, i+1);
+    subplot(K+1-2, 1, i+1);
     hold on;
-    plot(f1(1:100), (pxx1(1:100)));
-    
+    plot(f1(1:60), (pxx1(1:60)));
 
-
-    plot(f2(1:100), (pxx2(1:100)));
-    ylim = [-40,0];
+    plot(f2(1:60), (pxx2(1:60)));
     grid on;
-ylim = [-40,0];
+    legend('Feet', 'Hand')
+    title(titles(i));
+    xlabel('Hz');
+    ylabel('(μV)^2/Hz');
 
+    
     % subplot(K+1-4, 2, 2*i+2);
     % plot(u(i,:,ch2));
 end
+% saveas(gcf, 'ERP.png');
+%%
+
+[S_h, F_h, T_h] = spectrogram(hand_data(ch1,:), 50, 48, 64, Fs);
+freq_limit_index = find(F_h <= 30, 1, 'last');
+S_h = S_h(1:freq_limit_index, :);
+F_h = F_h(1:freq_limit_index);
+T_h = T_h -1;
+
+[S_f, F_f, T_f] = spectrogram(feet_data(ch1,:), 50, 48, 64, Fs);
+freq_limit_index = find(F <= 30, 1, 'last');
+S_f = S_f(1:freq_limit_index, :);
+F_f = F_f(1:freq_limit_index);
+T_f = T_f -1;
+
+figure;
+
+
+subplot(K+1-2,2,1);
+hold on;
+helperCWTTimeFreqPlot(S_f, T_f, F_f, 'surf', 'CWT of ERP Feet', 'Seconds', 'Hz');
+
+grid on;
+% title("PDS of ERP");
+
+subplot(K+1-2,2,2);
+hold on;
+helperCWTTimeFreqPlot(S_h, T_h, F_h, 'surf', 'CWT of ERP Hand', 'Seconds', 'Hz');
+grid on;
+% title("PDS of ERP");
+
+titles = ["CWT of IMF 4 Feet", "CWT of IMF 4 Hand", "CWT of IMF 3 Feet", "CWT of IMF 3 Hand"];
+for i = 1:K-2
+    [S_h, F_h, T_h] = spectrogram(u_h(i,:,ch1), 50, 48, 64, Fs);
+    freq_limit_index = find(F_h <= 30, 1, 'last');
+    S_h = S_h(1:freq_limit_index, :);
+    F_h = F_h(1:freq_limit_index);
+
+    T_h = T_h-1;
+
+
+    [S_f, F_f, T_f] = spectrogram(u_f(i,:,ch1), 50, 48, 64, Fs);
+    freq_limit_index = find(F_h <= 30, 1, 'last');
+    S_f = S_f(1:freq_limit_index, :);
+    F_f = F_f(1:freq_limit_index);
+
+    T_f = T_f-1;
+
+
+    subplot(K+1-2, 2, 2*i+1);
+    hold on;
+    helperCWTTimeFreqPlot(S_f, T_f, F_f, 'surf', 'STFT of ERP (30 Hz)', 'Seconds', 'Hz');
+    grid on;
+    title(titles(2*i-1));
+
+    subplot(K+1-2, 2, 2*i+2);
+    hold on;
+    helperCWTTimeFreqPlot(S_h, T_h, F_h, 'surf', 'STFT of ERP (30 Hz)', 'Seconds', 'Hz');
+    grid on;
+    title(titles(2*i));
+
+end
+% saveas(gcf, 'CWT.png');
 
