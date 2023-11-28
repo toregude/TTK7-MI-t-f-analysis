@@ -43,21 +43,21 @@ K = 4;
 
 %%
 t = linspace(-1,round((length(hand_data(1,:))-512)/512),length(hand_data(1,:)));
-ch1 = 2;
-ch2= 2;
+ch1 = 5;
+ch2= 5; % 2 or 13
 figure('Position', [10 10 1000 1000]);
 subplot(K+1-2,1,1);
 hold on;
 plot(t,feet_data(ch1,:));
 plot(t,hand_data(ch2,:));
 legend('Feet', 'Hand')
-title("ERP Subject 2");
+title("ERP C3");
 xlabel('Seconds');
 ylabel('μV');
 grid on;
 % subplot(K+1-4,2,2);
 % plot(evoked_data(ch2,:));
-titles = ["IMF 4 Subject 2", "IMF 3 Subject 2"];
+titles = ["IMF 4 C3", "IMF 3 C3"];
 for i = 1:K-2
     subplot(K+1-2, 1, i+1);
     hold on;
@@ -72,7 +72,7 @@ for i = 1:K-2
     % subplot(K+1-4, 2, 2*i+2);
     % plot(u(i,:,ch2));
 end
-% saveas(gcf, 'IMF2.png');
+saveas(gcf, 'IMF.png');
 % Generate a sample signal
 Fs = 512;          % Sampling frequency
 
@@ -88,12 +88,12 @@ plot(f2(1:60), (pxx2(1:60)));
 grid on;
 ylim = [-40,0];
 legend('Feet', 'Hand');
-title("PDS of ERP Subject 2");
+title("PDS of ERP C3");
 xlabel('Hz');
 ylabel('(μV)^2/Hz');
 % subplot(K+1-4,2,2);
 % plot(evoked_data(ch2,:));
-titles = ["PDS of IMF 4 Subject 2", "PDS of IMF 3 Subject 2"];
+titles = ["PDS of IMF 4 C3", "PDS of IMF 3 C3"];
 for i = 1:K-2
     % Compute power spectral density using pwelch
     [pxx1, f1] = pwelch(u_f(i,:,ch1), [], [], [], Fs);
@@ -114,7 +114,7 @@ for i = 1:K-2
     % subplot(K+1-4, 2, 2*i+2);
     % plot(u(i,:,ch2));
 end
-% saveas(gcf, 'ERP2.png');
+saveas(gcf, 'ERP.png');
 
 
 [S_h, F_h, T_h] = spectrogram(hand_data(ch1,:), 50, 48, 64, Fs);
@@ -135,7 +135,7 @@ figure('Position', [10 10 1000 1000]);
 
 subplot(K+1-2,2,1);
 hold on;
-helperCWTTimeFreqPlot(S_f, T_f, F_f, 'surf', 'STFT of ERP Feet Subject 2', 'Seconds', 'Hz');
+helperCWTTimeFreqPlot(S_f, T_f, F_f, 'surf', 'STFT of ERP Feet C3', 'Seconds', 'Hz');
 
 
 grid on;
@@ -143,11 +143,11 @@ grid on;
 
 subplot(K+1-2,2,2);
 hold on;
-helperCWTTimeFreqPlot(S_h, T_h, F_h, 'surf', 'STFT of ERP Hand Subject 2', 'Seconds', 'Hz');
+helperCWTTimeFreqPlot(S_h, T_h, F_h, 'surf', 'STFT of ERP Hand C3', 'Seconds', 'Hz');
 grid on;
 % title("PDS of ERP");
 
-titles = ["STFT of IMF 4 Feet Subject 2", "STFT of IMF 4 Hand Subject 2", "STFT of IMF 3 Feet Subject 2", "STFT of IMF 3 Hand Subject 2"];
+titles = ["STFT of IMF 4 Feet C3", "STFT of IMF 4 Hand C3", "STFT of IMF 3 Feet C3", "STFT of IMF 3 Hand C3"];
 for i = 1:K-2
     [S_h, F_h, T_h] = spectrogram(u_h(i,:,ch1), 50, 48, 64, Fs);
     freq_limit_index = find(F_h <= 30, 1, 'last');
@@ -178,5 +178,5 @@ for i = 1:K-2
     title(titles(2*i));
 
 end
-saveas(gcf, 'CWT2.png');
+saveas(gcf, 'CWT.png');
 
