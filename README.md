@@ -5,11 +5,17 @@ To get the data go to [http://bnci-horizon-2020.eu/database/data-sets]() (might 
 Then put them in the folder named data like so:
 
 data/
--S01T
--S01E
+
+-S01T.mat
+
+-S01E.mat
+
 -...
--S13T
--S13E
+
+-S13T.mat
+
+-S13E.mat
+
 
 Then run the mne_analisys.ipynb
 
